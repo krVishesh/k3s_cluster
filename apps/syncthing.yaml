@@ -1,0 +1,52 @@
+# SyncThing App Deployment
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: syncthing
+  namespace: syncthing
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+  selector:
+    matchLabels: 
+      app: syncthing
+  template:
+    metadata:
+      labels:
+        app: syncthing
+    spec:
+      nodeSelector:
+        role: "master"
+      containers:
+        - name: syncthing
+          image: linuxserver/syncthing:latest
+          ports:
+            - containerPort: 8384
+            - containerPort: 22000
+              protocol: TCP
+            - containerPort: 22000
+              protocol: UDP
+            - containerPort: 21027
+              protocol: UDP
+          env:
+            - name: PUID
+              value: "1000"
+            - name: PGID
+              value: "1000"
+            - name: TZ
+              value: "Asia/Kolkata"
+          volumeMounts:
+            - name: config
+              mountPath: /config
+            - name: backup
+              mountPath: /backup
+      volumes:
+        - name: config
+          persistentVolumeClaim:
+            claimName: syncthing-config-pvc
+        - name: backup
+          persistentVolumeClaim:
+            claimName: syncthing-pvc
+---

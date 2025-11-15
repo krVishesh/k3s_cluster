@@ -1,0 +1,59 @@
+# MariaDB StatefulSet
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: maria-db
+  namespace: media-server
+spec:
+  serviceName: maria-db
+  replicas: 1
+  selector:
+    matchLabels:
+      app: maria-db
+  template:
+    metadata:
+      labels:
+        app: maria-db
+    spec:
+      containers:
+        - name: mariadb
+          image: linuxserver/mariadb:latest
+          ports:
+            - name: mysql
+              containerPort: 3306
+          env:
+            - name: PUID
+              value: "1000"
+            - name: PGID
+              value: "1000"
+            - name: TZ
+              value: "Asia/Kolkata"
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mariadb-secret
+                  key: MYSQL_ROOT_PASSWORD
+            - name: MYSQL_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: mariadb-secret
+                  key: MYSQL_DATABASE
+            - name: MYSQL_USER
+              valueFrom:
+                secretKeyRef:
+                  name: mariadb-secret
+                  key: MYSQL_USER
+            - name: MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mariadb-secret
+                  key: MYSQL_PASSWORD
+          volumeMounts:
+            - name: config
+              mountPath: /config
+      volumes:
+        - name: config
+          persistentVolumeClaim:
+            claimName: mariadb-config-pvc
+---

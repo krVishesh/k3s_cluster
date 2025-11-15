@@ -1,0 +1,16 @@
+# Nextcloud Service
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nextcloud
+  namespace: media-server
+spec:
+  type: ClusterIP
+  selector:
+    app: nextcloud
+  ports:
+    - name: nextcloud-http
+      port: 80
+      targetPort: 80
+---

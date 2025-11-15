@@ -1,0 +1,78 @@
+# NextCloud Helm Values
+---
+replicaCount: 1
+
+nodeSelector:
+  load: "heavy"
+  persistence: "true"
+
+nextcloud:
+  existingSecret: 
+    enabled: true
+    secretName: nextcloud-creds
+    usernameKey: NEXTCLOUD_ADMIN_USER
+    passwordKey: NEXTCLOUD_ADMIN_PASSWORD
+  trustedDomains:
+    - nextcloud.media-server.svc.cluster.local
+    - nextcloud.local
+    - nextcloud
+  strategy:
+    type: RollingUpdate
+  extraEnv:
+    - name: TZ
+      value: "Asia/Kolkata"
+  # extraInitContainers:
+  #   - name: fix-permissions
+  #     image: busybox
+  #     command: ['sh', '-c', 'chown -R 33:33 /mnt/torrents /mnt/media']
+  #     volumeMounts:
+  #       - name: torrents
+  #         mountPath: /mnt/torrents
+  #       - name: media
+  #         mountPath: /mnt/media
+  extraVolumes:
+    - name: torrents
+      persistentVolumeClaim:
+        claimName: torrents-pvc
+    - name: media
+      persistentVolumeClaim:
+        claimName: media-pvc
+  extraVolumeMounts:
+    - name: torrents
+      mountPath: /mnt/torrents
+    - name: media
+      mountPath: /mnt/media
+
+internalDatabase:
+  enabled: false
+
+externalDatabase:
+  enabled: true
+  type: mysql
+  host: maria-db
+  existingSecret:
+    enabled: true
+    secretName: mariadb-secret
+    usernameKey: MYSQL_USER
+    passwordKey: MYSQL_PASSWORD
+    databaseKey: MYSQL_DATABASE
+
+service:
+  type: ClusterIP
+  port: 80
+
+persistence:
+  enabled: true
+  existingClaim: nextcloud-config-pvc
+  nextcloudData:
+    enabled: true
+    existingClaim: user-data-pvc
+
+resources:
+  requests: 
+    memory: 512Mi
+    cpu: 500m
+  limits:
+    memory: 1536Mi
+    cpu: 1000m
+---

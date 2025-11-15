@@ -1,0 +1,28 @@
+# Jellyfin Persistent Volume
+
+# All Media (Movies, Series, Music, ...)
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: media-pv
+spec:
+  capacity:
+    storage: 500Gi
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: local-storage
+  persistentVolumeReclaimPolicy: Retain
+  hostPath:
+    path: /srv/media
+    type: DirectoryOrCreate
+
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+          - key: persistence
+            operator: In
+            values: ["true"]
+---
+

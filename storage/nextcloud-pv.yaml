@@ -1,0 +1,27 @@
+# NextCloud Persistent Volume
+
+# NextCloud User Data
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: user-data-pv
+spec:
+  capacity:
+    storage: 200Gi
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: local-storage
+  persistentVolumeReclaimPolicy: Retain
+  hostPath:
+    path: /srv/user-data
+    type: DirectoryOrCreate
+
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+          - key: persistence
+            operator: In
+            values: ["true"]
+---

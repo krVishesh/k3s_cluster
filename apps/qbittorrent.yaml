@@ -1,0 +1,59 @@
+# qBitTorrent App Deployment
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: qbittorrent
+  namespace: media-server
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+  selector:
+    matchLabels: 
+      app: qbittorrent
+  template:
+    metadata: 
+      labels:
+        app: qbittorrent
+    spec:
+      nodeSelector:
+        load: "heavy"
+        persistence: "true"
+      containers:
+        - name: qbittorrent
+          image: linuxserver/qbittorrent:latest
+          ports: 
+            - containerPort: 8080
+            - containerPort: 6881
+            - containerPort: 6881
+              protocol: UDP
+          env:
+            - name: PUID
+              value: "1000"
+            - name: PGID
+              value: "1000"
+            - name: TZ
+              value: "Asia/Kolkata"
+            - name: WEBUI_PORT
+              value: "8080"
+            - name: TORRENTING_PORT
+              value: "6881"
+          volumeMounts:
+            - name: config
+              mountPath: /config
+            - name: downloads
+              mountPath: /downloads
+            - name: torrents
+              mountPath: /torrents
+      volumes:
+        - name: config
+          persistentVolumeClaim:
+            claimName: qbittorrent-config-pvc
+        - name: downloads
+          persistentVolumeClaim:
+            claimName: media-pvc
+        - name: torrents
+          persistentVolumeClaim:
+            claimName: torrents-pvc
+---

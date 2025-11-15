@@ -1,0 +1,34 @@
+# qBitTorrent PVC
+
+# qBitTorrent Torrents PVC
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: torrents-pvc
+  namespace: media-server
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+  volumeName: torrents-pv
+  storageClassName: local-storage
+---
+
+# qBitTorrent Config PVCs
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: qbittorrent-config-pvc
+  namespace: media-server
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  storageClassName: longhorn
+---

@@ -1,0 +1,34 @@
+# NextCloud PVCs
+
+# NextCloud User Data PVCs
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: user-data-pvc
+  namespace: media-server
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 200Gi
+  volumeName: user-data-pv
+  storageClassName: local-storage
+---
+
+# NextCloud Config PVCs
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: nextcloud-config-pvc
+  namespace: media-server
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+  storageClassName: longhorn
+---

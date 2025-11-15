@@ -1,0 +1,28 @@
+# Syncthing Service
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: syncthing
+  namespace: syncthing
+spec:
+  type: ClusterIP
+  selector:
+    app: syncthing
+  ports:
+    - name: sync-webui
+      port: 8384
+      targetPort: 8384
+    - name: sync-tcp
+      port: 22000
+      targetPort: 22000
+      protocol: TCP
+    - name: sync-udp
+      port: 22000
+      targetPort: 22000
+      protocol: UDP
+    - name: sync-discovery
+      port: 21027
+      targetPort: 21027
+      protocol: UDP
+---

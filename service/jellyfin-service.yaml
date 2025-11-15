@@ -1,0 +1,16 @@
+# Jellyfin Service
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: jellyfin
+  namespace: media-server
+spec:
+  type: ClusterIP
+  selector:
+    app: jellyfin
+  ports:
+    - name: jellyfin-http
+      port: 8096
+      targetPort: 8096
+---

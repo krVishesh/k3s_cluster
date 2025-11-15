@@ -1,0 +1,22 @@
+# Namespace for the Cluster
+
+# Media-server
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: media-server
+---
+
+# SyncThing
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: syncthing
+---
+
+# Longhorn
+---
+# Init Setup - kubectl apply -f https://raw.githubusercontent.com/longhorn/longhorn/v1.10.0/deploy/longhorn.yaml
+---

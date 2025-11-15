@@ -1,0 +1,99 @@
+# NextCloud App Deployment
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nextcloud
+  namespace: media-server
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app: nextcloud
+  template:
+    metadata:
+      labels:
+        app: nextcloud
+    spec:
+      nodeSelector:
+        load: "heavy"
+        persistence: "true"
+      initContainers:
+        - name: fix-permissions
+          image: busybox
+          command: ['sh', '-c', 'chown -R 33:33 /var/www/html /mnt/data /mnt/torrents /mnt/media']
+          volumeMounts:
+            - name: config
+              mountPath: /var/www/html
+            - name: data
+              mountPath: /mnt/data
+            - name: torrents
+              mountPath: /mnt/torrents
+            - name: media
+              mountPath: /mnt/media
+      containers:
+        - name: nextcloud
+          image: nextcloud:latest
+          ports:
+            - containerPort: 80
+          env:
+            - name: TZ
+              value: "Asia/Kolkata"
+            - name: MYSQL_HOST
+              value: "maria-db"
+            - name: MYSQL_DATABASE
+              valueFrom: 
+                secretKeyRef:
+                  name: mariadb-secret
+                  key: MYSQL_DATABASE
+            - name: MYSQL_USER
+              valueFrom: 
+                secretKeyRef:
+                  name: mariadb-secret
+                  key: MYSQL_USER
+            - name: MYSQL_PASSWORD
+              valueFrom: 
+                secretKeyRef:
+                  name: mariadb-secret
+                  key: MYSQL_PASSWORD
+            - name: NEXTCLOUD_ADMIN_USER
+              valueFrom:
+                secretKeyRef:
+                  name: nextcloud-creds
+                  key: NEXTCLOUD_ADMIN_USER
+            - name: NEXTCLOUD_ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: nextcloud-creds
+                  key: NEXTCLOUD_ADMIN_PASSWORD
+            - name: NEXTCLOUD_TRUSTED_DOMAINS
+              value: "nextcloud nextcloud.media-server.svc.cluster.local nextcloud.local"
+            - name: NEXTCLOUD_UPDATE
+              value: "0"
+            - name: NEXTCLOUD_DATA_DIR
+              value: "/mnt/data"
+          volumeMounts:
+            - name: config
+              mountPath: /var/www/html
+            - name: data
+              mountPath: /mnt/data
+            - name: torrents
+              mountPath: /mnt/torrents
+            - name: media
+              mountPath: /mnt/media
+      volumes:
+        - name: config
+          persistentVolumeClaim:
+            claimName: nextcloud-config-pvc
+        - name: data
+          persistentVolumeClaim:
+            claimName: user-data-pvc
+        - name: torrents
+          persistentVolumeClaim:
+            claimName: torrents-pvc
+        - name: media
+          persistentVolumeClaim:
+            claimName: media-pvc
+---

@@ -1,0 +1,27 @@
+# qBitTorrent Persistent Volume
+
+# qBitTorrent Torrents
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: torrents-pv
+spec:
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: local-storage
+  persistentVolumeReclaimPolicy: Retain
+  hostPath:
+    path: /srv/torrents
+    type: DirectoryOrCreate
+  
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+          - key: persistence
+            operator: In
+            values: ["true"]
+---

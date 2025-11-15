@@ -1,0 +1,53 @@
+# Jellyfin App Deployment
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jellyfin
+  namespace: media-server
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app: jellyfin
+  template:
+    metadata:
+      labels:
+        app: jellyfin
+    spec:
+      nodeSelector:
+        load: "heavy"
+        persistence: "true"
+      containers:
+        - name: jellyfin
+          image: linuxserver/jellyfin:latest
+          ports:
+            - containerPort: 8096
+          env:
+            - name: PUID
+              value: "1000"
+            - name: PGID
+              value: "1000"
+            - name: TZ
+              value: "Asia/Kolkata"
+          volumeMounts:
+            - name: config
+              mountPath: /config
+            - name: media
+              mountPath: /media
+            - name: render
+              mountPath: /dev/dri
+      volumes:
+        - name: config
+          persistentVolumeClaim:
+            claimName: jellyfin-config-pvc
+        - name: media
+          persistentVolumeClaim:
+            claimName: media-pvc
+        - name: render
+          hostPath:
+            path: /dev/dri
+            type: Directory
+---

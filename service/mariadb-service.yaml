@@ -1,0 +1,16 @@
+# MariaDB Service
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: maria-db
+  namespace: media-server
+spec:
+  type: ClusterIP
+  selector:
+    app: maria-db
+  ports:
+    - name: db-mysql
+      port: 3306
+      targetPort: 3306
+---

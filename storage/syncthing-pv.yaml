@@ -1,0 +1,19 @@
+# SyncThing Persistent Volume
+
+# SyncThing Backup
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: syncthing-pv
+spec:
+  capacity:
+    storage: 20Gi
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: local-storage
+  persistentVolumeReclaimPolicy: Retain
+  hostPath:
+    path: /srv/backup
+    type: DirectoryOrCreate
+---
