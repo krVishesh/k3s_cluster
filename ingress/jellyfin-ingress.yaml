@@ -19,4 +19,14 @@ spec:
                 name: jellyfin
                 port:
                   number: 8096
+    - host: media.kumarvishesh.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: jellyfin
+                port:
+                  number: 8096
 ---
