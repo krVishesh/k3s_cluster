@@ -1,0 +1,52 @@
+# CTFd Service
+
+# CTFd Redis Service
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ctfd-redis
+  namespace: ctfd
+spec:
+  clusterIP: None
+  selector:
+    app: ctfd-redis
+  ports:
+    - name: redis
+      port: 6379
+      targetPort: 6379
+---
+
+# CTFd Redis Sentinel Service
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ctfd-redis-sentinel
+  namespace: ctfd
+spec:
+  clusterIP: None
+  ports:
+  - port: 5000
+    targetPort: 5000
+    name: sentinel
+  selector:
+    app: ctfd-redis-sentinel
+---
+
+# CTFd Database Service
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ctfd-db
+  namespace: ctfd
+spec:
+  type: ClusterIP
+  selector:
+    app: ctfd-db
+  ports:
+    - name: db-mysql
+      port: 3306
+      targetPort: 3306
+---

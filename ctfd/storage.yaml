@@ -1,0 +1,17 @@
+# CTFd Storage
+
+# CTFd Database PVC
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ctfd-db-config-pvc
+  namespace: ctfd
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+  storageClassName: longhorn
+---
