@@ -1,5 +1,22 @@
 # CTFd Service
 
+# CTFd Service
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ctfd-main
+  namespace: ctfd
+spec:
+  type: ClusterIP
+  selector:
+    app: ctfd-main
+  ports:
+    - name: http
+      port: 8000
+      targetPort: 8000
+---
+
 # CTFd Redis Service
 ---
 apiVersion: v1

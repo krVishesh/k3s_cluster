@@ -1,0 +1,63 @@
+# CTFd Deployment
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ctfd-main
+  namespace: ctfd
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app: ctfd-main
+  template:
+    metadata:
+      labels:
+        app: ctfd-main
+    spec:
+      securityContext:
+        runAsUser: 0
+      containers:
+        - name: ctfd-main
+          image: ctfd/ctfd:latest
+          ports:
+            - containerPort: 8000
+          env:
+            - name: UPLOAD_FOLDER
+              value: "/var/uploads"
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: ctfd-secret
+                  key: DATABASE_URL
+            - name: REDIS_URL
+              valueFrom:
+                secretKeyRef:
+                  name: ctfd-secret
+                  key: REDIS_URL
+            - name: WORKERS
+              value: "1"
+            - name: LOG_FOLDER
+              value: "/var/log/CTFd"
+            - name: ACCESS_LOG
+              value: "-"
+            - name: ERROR_LOG
+              value: "-"
+            - name: REVERSE_PROXY
+              value: "true"
+          volumeMounts:
+            - name: logs
+              mountPath: /var/log/CTFd
+            - name: uploads
+              mountPath: /var/uploads
+      volumes:
+        - name: logs
+          persistentVolumeClaim:
+            claimName: ctfd-logs-pvc
+        - name: uploads
+          persistentVolumeClaim:
+            claimName: ctfd-uploads-pvc
+---
+

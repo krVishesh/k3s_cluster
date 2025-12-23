@@ -1,0 +1,60 @@
+# CTFd Database
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: ctfd-db
+  namespace: ctfd
+spec:
+  serviceName: ctfd-db
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ctfd-db
+  template:
+    metadata:
+      labels:
+        app: ctfd-db
+    spec:
+      containers:
+        - name: ctfd-db
+          image: linuxserver/mariadb:latest
+          ports:
+            - name: mysql
+              containerPort: 3306
+          env:
+            - name: PUID
+              value: "1000"
+            - name: PGID
+              value: "1000"
+            - name: TZ
+              value: "Asia/Kolkata"
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: ctfd-secret
+                  key: MYSQL_ROOT_PASSWORD
+            - name: MYSQL_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: ctfd-secret
+                  key: MYSQL_DATABASE
+            - name: MYSQL_USER
+              valueFrom:
+                secretKeyRef:
+                  name: ctfd-secret
+                  key: MYSQL_USER
+            - name: MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: ctfd-secret
+                  key: MYSQL_PASSWORD
+          volumeMounts:
+            - name: config
+              mountPath: /config
+      volumes:
+        - name: config
+          persistentVolumeClaim:
+            claimName: ctfd-db-config-pvc
+---
+
