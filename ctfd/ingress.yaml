@@ -19,5 +19,15 @@ spec:
                 name: ctfd-main
                 port:
                   number: 8000
+    - host: ctf.blackarc.in
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: ctfd-main
+                port:
+                  number: 8000
 ---
 
