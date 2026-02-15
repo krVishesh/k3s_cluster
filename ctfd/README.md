@@ -54,7 +54,9 @@ kubectl apply -f ingress.yaml
 
 ### Secrets
 
-⚠️ **IMPORTANT**: Configure `secrets.yaml` with secure passwords before deploying:
+⚠️ **IMPORTANT**: Configure `secrets.yaml` with secure values before deploying. The CTFd deployment uses two application secrets:
+
+**1. `ctfd-secret`** — database and Redis:
 
 ```yaml
 apiVersion: v1
@@ -72,7 +74,32 @@ stringData:
   REDIS_URL: "redis://:<redis-password>@ctfd-redis:6379"
 ```
 
-**Note**: Redis password must match in both `config-map.yaml` and `secrets.yaml`.
+**2. `ctfd-admin-secret`** — preset admin user and mail (SMTP) settings:
+
+```yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: ctfd-admin-secret
+  namespace: ctfd
+type: Opaque
+stringData:
+  PRESET_ADMIN_NAME: "<admin-display-name>"
+  PRESET_ADMIN_EMAIL: "<admin-email>"
+  PRESET_ADMIN_PASSWORD: "<admin-password>"
+  MAILFROM_ADDR: "<from-email>"
+  MAIL_SERVER: "<smtp-host>"
+  MAIL_PORT: "587"
+  MAIL_USEAUTH: "true"
+  MAIL_USERNAME: "<smtp-user>"
+  MAIL_PASSWORD: "<smtp-password>"
+  MAIL_TLS: "true"
+  MAIL_SSL: "false"
+```
+
+**Notes**:
+- Redis password must match in both `config-map.yaml` and `secrets.yaml`.
+- Adjust `MAIL_*` values for your SMTP provider (e.g. Gmail app password, SendGrid, etc.).
 
 ## Access
 
@@ -135,11 +162,11 @@ ctfd/
 ## Security Notes
 
 ⚠️ Before production:
-1. Set strong passwords in `secrets.yaml`
+1. Set strong passwords in `secrets.yaml` (both `ctfd-secret` and `ctfd-admin-secret`)
 2. Match Redis password in `config-map.yaml` and `secrets.yaml`
 3. Enable TLS/HTTPS in ingress
 4. Use external secret management
-5. Never commit passwords to version control
+5. Never commit passwords or admin/mail credentials to version control
 
 ## References
 

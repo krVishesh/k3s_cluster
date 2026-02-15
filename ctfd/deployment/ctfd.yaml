@@ -47,6 +47,61 @@ spec:
               value: "-"
             - name: REVERSE_PROXY
               value: "true"
+            - name: PRESET_ADMIN_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: ctfd-admin-secret
+                  key: PRESET_ADMIN_NAME
+            - name: PRESET_ADMIN_EMAIL
+              valueFrom:
+                secretKeyRef:
+                  name: ctfd-admin-secret
+                  key: PRESET_ADMIN_EMAIL
+            - name: PRESET_ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: ctfd-admin-secret
+                  key: PRESET_ADMIN_PASSWORD
+            - name: MAILFROM_ADDR
+              valueFrom:
+                secretKeyRef:
+                  name: ctfd-admin-secret
+                  key: MAILFROM_ADDR
+            - name: MAIL_SERVER
+              valueFrom:
+                secretKeyRef:
+                  name: ctfd-admin-secret
+                  key: MAIL_SERVER
+            - name: MAIL_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: ctfd-admin-secret
+                  key: MAIL_PORT
+            - name: MAIL_USEAUTH
+              valueFrom:
+                secretKeyRef:
+                  name: ctfd-admin-secret
+                  key: MAIL_USEAUTH
+            - name: MAIL_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: ctfd-admin-secret
+                  key: MAIL_USERNAME
+            - name: MAIL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: ctfd-admin-secret
+                  key: MAIL_PASSWORD
+            - name: MAIL_TLS
+              valueFrom:
+                secretKeyRef:
+                  name: ctfd-admin-secret
+                  key: MAIL_TLS
+            - name: MAIL_SSL
+              valueFrom:
+                secretKeyRef:
+                  name: ctfd-admin-secret
+                  key: MAIL_SSL
           volumeMounts:
             - name: logs
               mountPath: /var/log/CTFd
