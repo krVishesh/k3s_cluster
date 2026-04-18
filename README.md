@@ -11,6 +11,7 @@ A collection of Kubernetes manifests for deploying self-hosted services on k3s. 
 - **Syncthing** - Decentralized file synchronization
 - **Cloudflared** - Cloudflare tunnel for secure remote access
 - **Longhorn** - Distributed block storage for Kubernetes
+- **Prometheus Stack** - Cluster monitoring with Prometheus, Alertmanager, and Grafana
 
 ## 📁 Project Structure
 
@@ -31,6 +32,7 @@ k3s_scripts/
 - k3s cluster installed and running
 - `kubectl` configured to access your cluster
 - Longhorn installed (for persistent storage)
+- Helm installed (for `prometheus-community/kube-prometheus-stack`)
 - Traefik ingress controller (comes with k3s by default)
 - Node labels configured:
   - `load=heavy` - For resource-intensive workloads
@@ -59,6 +61,7 @@ Required secrets:
 - `nextcloud-creds.yaml` - Nextcloud admin credentials
 - `cloudflared-creds.yaml` - Cloudflare tunnel credentials
 - `longhorn-secret.yaml` - Longhorn configuration (if needed)
+- `monitoring-secrets.yaml` - Grafana admin username and password for the monitoring stack
 
 Example secret structure:
 ```yaml
@@ -73,6 +76,20 @@ stringData:
   MYSQL_DATABASE: nextcloud
   MYSQL_USER: nextcloud
   MYSQL_PASSWORD: your-db-password
+```
+
+Grafana credentials are read from the `monitoring-secrets` Secret in the `monitoring` namespace:
+
+```yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: monitoring-secrets
+  namespace: monitoring
+type: Opaque
+stringData:
+  grafana-admin-user: your-admin-user
+  grafana-admin-password: your-strong-password
 ```
 
 ### 4. Deploy Storage
@@ -94,13 +111,27 @@ kubectl apply -f secrets/
 kubectl apply -f apps/
 ```
 
-### 7. Deploy Services
+### 7. Deploy Monitoring Stack
+
+Add the Prometheus Community Helm repository if needed, then deploy the stack with the values from `helm/prometheus-stack.yaml`:
+
+```bash
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm repo update
+helm upgrade --install prometheus-stack prometheus-community/kube-prometheus-stack \
+  -n monitoring \
+  -f helm/prometheus-stack.yaml
+```
+
+This installs Prometheus, Alertmanager, and Grafana. Grafana uses the admin credentials stored in `secrets/monitoring-secrets.yaml`.
+
+### 8. Deploy Services
 
 ```bash
 kubectl apply -f service/
 ```
 
-### 8. Deploy Ingress
+### 9. Deploy Ingress
 
 ```bash
 kubectl apply -f ingress/
@@ -125,6 +156,7 @@ The ingress configurations use Traefik. Update the `host` fields in the ingress 
 - `jellyfin.local` → Your Jellyfin domain
 - `qbittorrent.local` → Your qBittorrent domain
 - `syncthing.local` → Your Syncthing domain
+- `grafana.local` → Your Grafana domain
 
 ### Timezone
 
@@ -134,8 +166,10 @@ Default timezone is set to `Asia/Kolkata`. Update the `TZ` environment variable 
 
 - All persistent volumes use Longhorn storage class
 - Services are deployed in the `media-server` and `syncthing` namespaces
+- Monitoring components are deployed in the `monitoring` namespace via Helm
 - Nextcloud is configured to use MariaDB as the database backend
 - Volume mounts are configured for data persistence across pod restarts
+- Grafana admin credentials are sourced from the `monitoring-secrets` Kubernetes Secret
 
 ## 🔒 Security
 
@@ -168,6 +202,7 @@ Check pod status:
 ```bash
 kubectl get pods -n media-server
 kubectl get pods -n syncthing
+kubectl get pods -n monitoring
 ```
 
 View logs:
@@ -182,4 +217,3 @@ This project is provided as-is for personal use.
 ## 🤝 Contributing
 
 Feel free to submit issues or pull requests for improvements.
-

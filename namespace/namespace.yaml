@@ -20,3 +20,11 @@ metadata:
 ---
 # Init Setup - kubectl apply -f https://raw.githubusercontent.com/longhorn/longhorn/v1.10.0/deploy/longhorn.yaml
 ---
+
+# Monitoring Namespace
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: monitoring
+---
