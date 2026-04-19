@@ -1,0 +1,19 @@
+# Uptime-Kuma Helm Values
+
+namespaceOverride: "monitoring"
+
+ingress:
+  enabled: true
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: web
+  hosts:
+    - host: uptime.local
+      paths:
+        - path: /
+          pathType: Prefix
+
+volume:
+  storageClassName: longhorn
+
+nodeSelector:
+  kubernetes.io/hostname: pi400-agent
